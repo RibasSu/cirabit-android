@@ -288,7 +288,7 @@ class GeohashViewModel(
             repo.updateReactiveParticipantCounts()
             val sysMsg = com.cirabit.android.model.CirabitMessage(
                 sender = "system",
-                content = "blocked $targetNickname in geohash channels",
+                content = "Blocked $targetNickname in geohash channels",
                 timestamp = Date(),
                 isRelay = false
             )
@@ -296,7 +296,7 @@ class GeohashViewModel(
         } else {
             val sysMsg = com.cirabit.android.model.CirabitMessage(
                 sender = "system",
-                content = "user '$targetNickname' not found in current geohash",
+                content = "User '$targetNickname' not found in current geohash",
                 timestamp = Date(),
                 isRelay = false
             )

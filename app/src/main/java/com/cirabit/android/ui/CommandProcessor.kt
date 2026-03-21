@@ -1,13 +1,16 @@
 package com.cirabit.android.ui
 
+import android.content.Context
 import com.cirabit.android.mesh.BluetoothMeshService
 import com.cirabit.android.model.CirabitMessage
+import com.cirabit.android.R
 import java.util.Date
 
 /**
  * Handles processing of IRC-style commands
  */
 class CommandProcessor(
+    private val context: Context,
     private val state: ChatState,
     private val messageManager: MessageManager,
     private val channelManager: ChannelManager,
@@ -16,15 +19,15 @@ class CommandProcessor(
     
     // Available commands list
     private val baseCommands = listOf(
-        CommandSuggestion("/block", emptyList(), "[nickname]", "block or list blocked peers"),
-        CommandSuggestion("/channels", emptyList(), null, "show all discovered channels"),
-        CommandSuggestion("/clear", emptyList(), null, "clear chat messages"),
-        CommandSuggestion("/hug", emptyList(), "<nickname>", "send someone a warm hug"),
-        CommandSuggestion("/j", listOf("/join"), "<channel>", "join or create a channel"),
-        CommandSuggestion("/m", listOf("/msg"), "<nickname> [message]", "send private message"),
-        CommandSuggestion("/slap", emptyList(), "<nickname>", "slap someone with a trout"),
-        CommandSuggestion("/unblock", emptyList(), "<nickname>", "unblock a peer"),
-        CommandSuggestion("/w", emptyList(), null, "see who's online")
+        CommandSuggestion("/block", emptyList(), "[nickname]", "Block or list blocked peers"),
+        CommandSuggestion("/channels", emptyList(), null, "Show all discovered channels"),
+        CommandSuggestion("/clear", emptyList(), null, "Clear chat messages"),
+        CommandSuggestion("/hug", emptyList(), "<nickname>", context.getString(R.string.command_desc_hug)),
+        CommandSuggestion("/j", listOf("/join"), "<channel>", "Join or create a channel"),
+        CommandSuggestion("/m", listOf("/msg"), "<nickname> [message]", "Send private message"),
+        CommandSuggestion("/slap", emptyList(), "<nickname>", context.getString(R.string.command_desc_slap)),
+        CommandSuggestion("/unblock", emptyList(), "<nickname>", "Unblock a peer"),
+        CommandSuggestion("/w", emptyList(), null, "See who's online")
     )
     
     // MARK: - Command Processing
@@ -42,8 +45,8 @@ class CommandProcessor(
             "/pass" -> handlePassCommand(parts, myPeerID)
             "/block" -> handleBlockCommand(parts, meshService)
             "/unblock" -> handleUnblockCommand(parts, meshService)
-            "/hug" -> handleActionCommand(parts, "gives", "a warm hug 🫂", meshService, myPeerID, onSendMessage)
-            "/slap" -> handleActionCommand(parts, "slaps", "around a bit with a large trout 🐟", meshService, myPeerID, onSendMessage)
+            "/hug" -> handleActionCommand(parts, R.string.command_action_hug_format, meshService, myPeerID, onSendMessage)
+            "/slap" -> handleActionCommand(parts, R.string.command_action_slap_format, meshService, myPeerID, onSendMessage)
             "/channels" -> handleChannelsCommand()
             else -> handleUnknownCommand(cmd)
         }
@@ -60,7 +63,7 @@ class CommandProcessor(
             if (success) {
                 val systemMessage = CirabitMessage(
                     sender = "system",
-                    content = "joined channel $channel",
+                    content = "Joined channel $channel",
                     timestamp = Date(),
                     isRelay = false
                 )
@@ -69,7 +72,7 @@ class CommandProcessor(
         } else {
             val systemMessage = CirabitMessage(
                 sender = "system",
-                content = "usage: /join <channel>",
+                content = "Usage: /join <channel>",
                 timestamp = Date(),
                 isRelay = false
             )
@@ -102,7 +105,7 @@ class CommandProcessor(
                     } else {
                         val systemMessage = CirabitMessage(
                             sender = "system",
-                            content = "started private chat with $targetName",
+                            content = "Started private chat with $targetName",
                             timestamp = Date(),
                             isRelay = false
                         )
@@ -112,7 +115,7 @@ class CommandProcessor(
             } else {
                 val systemMessage = CirabitMessage(
                     sender = "system",
-                    content = "user '$targetName' not found. they may be offline or using a different nickname.",
+                    content = "User '$targetName' not found. They may be offline or using a different nickname.",
                     timestamp = Date(),
                     isRelay = false
                 )
@@ -121,7 +124,7 @@ class CommandProcessor(
         } else {
             val systemMessage = CirabitMessage(
                 sender = "system",
-                content = "usage: /msg <nickname> [message]",
+                content = "Usage: /msg <nickname> [message]",
                 timestamp = Date(),
                 isRelay = false
             )
@@ -140,7 +143,7 @@ class CommandProcessor(
                     val peerList = connectedPeers.joinToString(", ") { peerID ->
                         getPeerNickname(peerID, meshService)
                     }
-                    Pair(peerList, "online users")
+                    Pair(peerList, "Online users")
                 }
                 
                 is com.cirabit.android.geohash.ChannelID.Location -> {
@@ -158,7 +161,7 @@ class CommandProcessor(
                         }
                     }.joinToString(", ")
                     
-                    Pair(participantList, "participants in ${selectedChannel.channel.geohash}")
+                    Pair(participantList, "Participants in ${selectedChannel.channel.geohash}")
                 }
             }
         } else {
@@ -167,13 +170,13 @@ class CommandProcessor(
             val peerList = connectedPeers.joinToString(", ") { peerID ->
                 getPeerNickname(peerID, meshService)
             }
-            Pair(peerList, "online users")
+            Pair(peerList, "Online users")
         }
         
         val systemMessage = CirabitMessage(
             sender = "system",
             content = if (peerList.isEmpty()) {
-                "no one else is around right now."
+                "No one else is around right now."
             } else {
                 "$contextDescription: $peerList"
             },
@@ -208,7 +211,7 @@ class CommandProcessor(
         if (currentChannel == null) {
             val systemMessage = CirabitMessage(
                 sender = "system",
-                content = "you must be in a channel to set a password.",
+                content = "You must be in a channel to set a password.",
                 timestamp = Date(),
                 isRelay = false
             )
@@ -220,7 +223,7 @@ class CommandProcessor(
             if(!channelManager.isChannelCreator(channel = currentChannel, peerID = peerID)){
                 val systemMessage = CirabitMessage(
                     sender = "system",
-                    content = "you must be the channel creator to set a password.",
+                    content = "You must be the channel creator to set a password.",
                     timestamp = Date(),
                     isRelay = false
                 )
@@ -231,7 +234,7 @@ class CommandProcessor(
             channelManager.setChannelPassword(currentChannel, newPassword)
             val systemMessage = CirabitMessage(
                 sender = "system",
-                content = "password changed for channel $currentChannel",
+                content = "Password changed for channel $currentChannel",
                 timestamp = Date(),
                 isRelay = false
             )
@@ -240,7 +243,7 @@ class CommandProcessor(
         else{
             val systemMessage = CirabitMessage(
                 sender = "system",
-                content = "usage: /pass <password>",
+                content = "Usage: /pass <password>",
                 timestamp = Date(),
                 isRelay = false
             )
@@ -272,7 +275,7 @@ class CommandProcessor(
         } else {
             val systemMessage = CirabitMessage(
                 sender = "system",
-                content = "usage: /unblock <nickname>",
+                content = "Usage: /unblock <nickname>",
                 timestamp = Date(),
                 isRelay = false
             )
@@ -282,15 +285,15 @@ class CommandProcessor(
     
     private fun handleActionCommand(
         parts: List<String>, 
-        verb: String, 
-        object_: String, 
+        actionMessageFormatRes: Int,
         meshService: BluetoothMeshService,
         myPeerID: String,
         onSendMessage: (String, List<String>, String?) -> Unit
     ) {
         if (parts.size > 1) {
             val targetName = parts[1].removePrefix("@")
-            val actionMessage = "* ${state.getNicknameValue() ?: "someone"} $verb $targetName $object_ *"
+            val actorName = state.getNicknameValue() ?: context.getString(R.string.action_actor_fallback)
+            val actionMessage = context.getString(actionMessageFormatRes, actorName, targetName)
 
             // If we're in a geohash location channel, don't add a local echo here.
             // GeohashViewModel.sendGeohashMessage() will add the local echo with proper metadata.
@@ -332,7 +335,10 @@ class CommandProcessor(
         } else {
             val systemMessage = CirabitMessage(
                 sender = "system",
-                content = "usage: /${parts[0].removePrefix("/")} <nickname>",
+                content = context.getString(
+                    R.string.command_usage_nickname,
+                    parts[0].removePrefix("/")
+                ),
                 timestamp = Date(),
                 isRelay = false
             )
@@ -343,9 +349,9 @@ class CommandProcessor(
     private fun handleChannelsCommand() {
         val allChannels = channelManager.getJoinedChannelsList()
         val channelList = if (allChannels.isEmpty()) {
-            "no channels joined"
+            "No channels joined"
         } else {
-            "joined channels: ${allChannels.joinToString(", ")}"
+            "Joined channels: ${allChannels.joinToString(", ")}"
         }
         
         val systemMessage = CirabitMessage(
@@ -360,7 +366,7 @@ class CommandProcessor(
     private fun handleUnknownCommand(cmd: String) {
         val systemMessage = CirabitMessage(
             sender = "system",
-            content = "unknown command: $cmd. type / to see available commands.",
+            content = "Unknown command: $cmd. Type / to see available commands.",
             timestamp = Date(),
             isRelay = false
         )
@@ -395,9 +401,9 @@ class CommandProcessor(
         // Add channel-specific commands if in a channel
         val channelCommands = if (state.getCurrentChannelValue() != null) {
             listOf(
-                CommandSuggestion("/pass", emptyList(), "[password]", "change channel password"),
-                CommandSuggestion("/save", emptyList(), null, "save channel messages locally"),
-                CommandSuggestion("/transfer", emptyList(), "<nickname>", "transfer channel ownership")
+                CommandSuggestion("/pass", emptyList(), "[password]", "Change channel password"),
+                CommandSuggestion("/save", emptyList(), null, "Save channel messages locally"),
+                CommandSuggestion("/transfer", emptyList(), "<nickname>", "Transfer channel ownership")
             )
         } else {
             emptyList()
