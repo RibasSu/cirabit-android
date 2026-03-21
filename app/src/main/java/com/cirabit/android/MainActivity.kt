@@ -2,6 +2,7 @@ package com.cirabit.android
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -9,11 +10,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -22,6 +25,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -79,6 +83,8 @@ class MainActivity : OrientationAwareActivity() {
     private var shouldRequireAppUnlock = false
     private var isAppUnlockInProgress = false
     private var isAppContentUnlocked by mutableStateOf(true)
+    private var appLockPromptSucceeded = false
+    private var suppressRelockUntilElapsedRealtimeMs = 0L
     private var isCoreInitialized = false
     private val appLockPrompt by lazy { createAppLockPrompt() }
     
@@ -181,6 +187,11 @@ class MainActivity : OrientationAwareActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    contentDescription = stringResource(R.string.app_name),
+                    modifier = Modifier.size(84.dp)
+                )
                 Text(
                     text = stringResource(R.string.app_lock_prompt_title),
                     style = MaterialTheme.typography.titleMedium,
@@ -801,6 +812,11 @@ class MainActivity : OrientationAwareActivity() {
     override fun onResume() {
         super.onResume()
         if (shouldRequireAppUnlock) {
+            // Recover if OEM/OS interrupted prompt flow without delivering callback.
+            if (isAppUnlockInProgress) {
+                Log.w("MainActivity", "Resetting stale app-lock in-progress state on resume")
+                isAppUnlockInProgress = false
+            }
             maybeAuthenticateAppLock()
             if (shouldRequireAppUnlock || isAppUnlockInProgress) return
         }
@@ -830,7 +846,11 @@ class MainActivity : OrientationAwareActivity() {
             // Detach UI delegate so the foreground service can own DM notifications while UI is closed
             try { meshService.delegate = null } catch (_: Exception) { }
 
+            val shouldSuppressRelockForThisPause =
+                SystemClock.elapsedRealtime() < suppressRelockUntilElapsedRealtimeMs
+
             if (
+                !shouldSuppressRelockForThisPause &&
                 !isChangingConfigurations &&
                 AppLockPreferenceManager.isEnabled() &&
                 !isAppUnlockInProgress
@@ -874,12 +894,15 @@ class MainActivity : OrientationAwareActivity() {
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
+                    appLockPromptSucceeded = true
                     isAppUnlockInProgress = false
                     if (!ensureCoreInitializedSafely()) {
+                        suppressRelockUntilElapsedRealtimeMs = 0L
                         shouldRequireAppUnlock = true
                         isAppContentUnlocked = false
                         return
                     }
+                    suppressRelockUntilElapsedRealtimeMs = SystemClock.elapsedRealtime() + 1500L
                     shouldRequireAppUnlock = false
                     isAppContentUnlocked = true
                     Log.d("MainActivity", "App lock authentication succeeded")
@@ -899,14 +922,18 @@ class MainActivity : OrientationAwareActivity() {
 
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     super.onAuthenticationError(errorCode, errString)
+                    if (appLockPromptSucceeded) {
+                        Log.w(
+                            "MainActivity",
+                            "Ignoring app lock authentication error after success ($errorCode): $errString"
+                        )
+                        return
+                    }
                     isAppUnlockInProgress = false
+                    suppressRelockUntilElapsedRealtimeMs = 0L
                     shouldRequireAppUnlock = true
                     isAppContentUnlocked = false
                     Log.w("MainActivity", "App lock authentication error ($errorCode): $errString")
-
-                    if (mainViewModel.onboardingState.value == OnboardingState.COMPLETE) {
-                        moveTaskToBack(true)
-                    }
                 }
             }
         )
@@ -935,6 +962,8 @@ class MainActivity : OrientationAwareActivity() {
 
         isAppContentUnlocked = false
         isAppUnlockInProgress = true
+        appLockPromptSucceeded = false
+        suppressRelockUntilElapsedRealtimeMs = 0L
         runCatching {
             appLockPrompt.authenticate(
                 BiometricPrompt.PromptInfo.Builder()
@@ -945,6 +974,8 @@ class MainActivity : OrientationAwareActivity() {
             )
         }.onFailure { error ->
             isAppUnlockInProgress = false
+            appLockPromptSucceeded = false
+            suppressRelockUntilElapsedRealtimeMs = 0L
             shouldRequireAppUnlock = true
             isAppContentUnlocked = false
             Log.e("MainActivity", "Failed to launch app lock prompt", error)
