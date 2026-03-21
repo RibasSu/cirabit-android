@@ -31,7 +31,7 @@
     <string name="battery_optimization_why_disable">Por que desativar a otimização de bateria?</string>
     <string name="battery_optimization_explanation">O cirabit roda em segundo plano para manter conexões mesh com dispositivos próximos. A otimização de bateria pode interromper essas conexões, fazendo com que mensagens atrasem ou se percam.\n\nDesativar a otimização de bateria garante comunicação P2P confiável.</string>
     <string name="battery_optimization_disable_button">Desativar otimização de bateria</string>
-    <string name="battery_optimization_note">Nota: Você pode alterar isso depois em Configurações do Android &gt; Apps &gt; cirabit &gt; Bateria.</string>
+    <string name="battery_optimization_note">Nota: Você pode alterar isso depois em Configurações do Android &gt; Aplicativos &gt; Cirabit &gt; Bateria.</string>
     <string name="battery_optimization_not_supported_explanation">Seu dispositivo não requer ajustes de otimização de bateria. O cirabit funcionará normalmente.</string>
     <string name="battery_optimization_not_supported_message">Seu dispositivo não requer ajustes de otimização de bateria. O cirabit funcionará normalmente.</string>
     <string name="battery_optimization_success_message">O cirabit pode operar de forma confiável em segundo plano</string>
@@ -57,8 +57,8 @@
     <string name="notification_new_activity_in">Nova atividade em %1$s</string>
     <string name="notification_messages_in">Mensagens em %1$s</string>
     <string name="notification_joined_conversation">%1$s entrou na conversa</string>
-    <string name="notification_geohash_summary_title_mentions">cirabit – %1$d menções</string>
-    <string name="notification_geohash_summary_title">cirabit – Chats por localização</string>
+    <string name="notification_geohash_summary_title_mentions">Cirabit – %1$d menções</string>
+    <string name="notification_geohash_summary_title">Cirabit – chats por localização</string>
     <string name="notification_geohash_summary_text">%1$d mensagens de %2$d locais</string>
     <string name="notification_mesh_mention_title_singular">Mencionado no chat mesh</string>
     <string name="notification_mesh_mention_title_plural">%1$d menções no chat mesh</string>
@@ -77,7 +77,7 @@
     <string name="cd_nostr_reachable">Acessível via Nostr</string>
     <string name="cd_unread_private_messages">Mensagens privadas não lidas</string>
     <string name="cd_toggle_bookmark">Alternar favorito</string>
-    <string name="cd_teleported">Teletransportado</string>
+    <string name="cd_teleported">Teleportado</string>
     <string name="cd_tor_status">Status do Tor</string>
     <string name="cd_connected_peers">Peers conectados</string>
     <string name="cd_geohash_participants">Participantes geohash</string>
@@ -100,7 +100,7 @@
     <string name="about_offline_mesh_title">Chat mesh offline</string>
     <string name="about_offline_mesh_desc">Comunique diretamente via Bluetooth LE sem internet ou servidores. As mensagens são retransmitidas por dispositivos próximos para ampliar o alcance.</string>
     <string name="about_online_geohash_title">Canais geohash online</string>
-    <string name="about_online_geohash_desc">Conecte-se com pessoas próximas através de canais baseados em geohash. Expanda a mesh por meio de relays públicos na internet.</string>
+    <string name="about_online_geohash_desc">Conecte-se com pessoas próximas por canais baseados em geohash. Expanda a mesh usando relays públicos na internet.</string>
     <string name="about_e2e_title">Criptografia de ponta a ponta</string>
     <string name="about_e2e_desc">Mensagens privadas são criptografadas. Mensagens de canal são públicas.</string>
     <string name="about_appearance">Aparência</string>
@@ -146,7 +146,7 @@
     <string name="cd_unread_message">Mensagem não lida</string>
     <string name="cd_open_map">Abrir mapa</string>
     <string name="cd_remove_bookmark">Remover favorito</string>
-    <string name="cd_teleport">Teletransportar</string>
+    <string name="cd_teleport">Teleportar</string>
     <string name="cd_selected">Selecionado</string>
     <string name="cd_leave_channel">Sair do canal</string>
     <string name="cd_reachable_via_nostr">Acessível via Nostr</string>
@@ -195,7 +195,7 @@
 
     <!-- Canais geohash -->
     <string name="location_channels_title">#Canais de localização</string>
-    <string name="location_channels_desc">Converse com pessoas próximas através de canais geohash. Apenas um geohash aproximado é compartilhado, nunca dados exatos de GPS. Para preservar sua privacidade, não tire capturas de tela nem compartilhe esta tela.</string>
+    <string name="location_channels_desc">Converse com pessoas próximas por canais geohash. Apenas um geohash aproximado é compartilhado, nunca dados exatos de GPS. Para preservar sua privacidade, não tire capturas de tela nem compartilhe esta tela.</string>
     <string name="grant_location_permission">Conceder permissão de localização</string>
     <string name="location_permission_denied">Permissão de localização negada. Ative nas configurações para usar canais de localização.</string>
     <string name="open_settings">Abrir configurações</string>
@@ -205,7 +205,7 @@
     <string name="bookmarked">Marcado</string>
     <string name="geohash_placeholder">Geohash</string>
     <string name="invalid_geohash">Geohash inválido</string>
-    <string name="teleport">teletransportar</string>
+    <string name="teleport">teleportar</string>
     <string name="disable_location_services">Desativar serviços de localização</string>
     <string name="enable_location_services">Ativar serviços de localização</string>
     <string name="mesh_label">mesh</string>
@@ -354,9 +354,9 @@
     <item quantity="other">#%1$s ± 1 • %2$d notas</item>
   </plurals>
   <string name="location_notes_description">adicione notas curtas e permanentes a este local para que outros visitantes as encontrem.</string>
-  <string name="location_notes_relays_unavailable">relés geográficos indisponíveis; notas em pausa</string>
-  <string name="location_notes_no_relays_title">nenhum relé geográfico nas proximidades</string>
-  <string name="location_notes_no_relays_desc">as notas dependem de relés geográficos. verifique a conexão e tente novamente.</string>
+  <string name="location_notes_relays_unavailable">relays geográficos indisponíveis; notas em pausa</string>
+  <string name="location_notes_no_relays_title">nenhum relay geográfico por perto</string>
+  <string name="location_notes_no_relays_desc">as notas dependem de relays geográficos. verifique a conexão e tente novamente.</string>
   <string name="loading_location_notes">carregando notas…</string>
   <string name="location_notes_empty_title">ainda não há notas</string>
   <string name="location_notes_empty_desc">seja o primeiro a adicionar uma para este local.</string>
@@ -365,15 +365,15 @@
     <string name="mesh_service_notification_content">Mesh rodando — %1$d pares</string>
 
   <string name="verify_title">verificar</string>
-  <string name="verify_my_qr_title">digitalize para verificar-me</string>
-  <string name="verify_scan_prompt_friend">digitalizar outro qr</string>
-  <string name="verify_scan_someone">digitalizar outro qr</string>
-  <string name="verify_show_my_qr">mostrar meu qr</string>
+  <string name="verify_my_qr_title">escaneie para me verificar</string>
+  <string name="verify_scan_prompt_friend">escanear outro QR</string>
+  <string name="verify_scan_someone">escanear outro QR</string>
+  <string name="verify_show_my_qr">mostrar meu QR</string>
   <string name="verify_remove">remover verificação</string>
-  <string name="verify_qr_unavailable">qr indisponível</string>
+  <string name="verify_qr_unavailable">QR indisponível</string>
   <string name="verify_camera_permission">permissão de câmera necessária</string>
   <string name="verify_request_camera">ativar câmera</string>
-  <string name="verify_paste_label">colar url de verificação</string>
+  <string name="verify_paste_label">colar URL de verificação</string>
   <string name="verify_validate">validar</string>
   <string name="verify_scanned">verificação solicitada</string>
   <string name="security_verification_title">verificação de segurança</string>
@@ -394,9 +394,57 @@
   <string name="fingerprint_start_handshake">iniciar handshake</string>
   <string name="fingerprint_copy">copiar</string>
   <string name="verify_mutual_match_title">Verificação mútua</string>
-  <string name="verify_mutual_match_body">Você e %1$s verificaram-se</string>
+  <string name="verify_mutual_match_body">Você e %1$s se verificaram</string>
   <string name="verify_mutual_system_message">verificação mútua com %1$s</string>
   <string name="verify_success_title">Verificado</string>
   <string name="verify_success_body">Você verificou %1$s</string>
   <string name="verify_success_system_message">verificou %1$s</string>
+
+  <!-- Completar cobertura pt-BR -->
+  <string name="about_background_title">executar em segundo plano</string>
+  <string name="about_background_desc">manter a mesh ativa quando o app estiver fechado (serviço em primeiro plano)</string>
+  <string name="app_brand">cirabit/</string>
+  <string name="at_symbol">@</string>
+  <string name="at_nickname">@%1$s</string>
+  <string name="background_location_required_title">Localização em segundo plano recomendada</string>
+  <string name="background_location_required_subtitle">opcional, melhora a confiabilidade da mesh</string>
+  <string name="background_location_explanation">O Android recomenda localização em segundo plano para que o cirabit possa procurar dispositivos próximos enquanto o app não está aberto. Isso mantém a mesh ativa após reiniciar.</string>
+  <string name="background_location_settings_tip">Quando as configurações abrirem, escolha "Permitir o tempo todo".</string>
+  <string name="background_location_needs_for">o cirabit usa localização em segundo plano para:</string>
+  <string name="background_location_needs_bullets">- procurar dispositivos próximos enquanto o app está fechado\n- reconectar após reiniciar\n- manter a mesh ativa em segundo plano</string>
+  <string name="background_location_privacy_note">NUNCA coletamos nem armazenamos sua localização. Sua privacidade está protegida.</string>
+  <string name="grant_background_location">Permitir localização em segundo plano</string>
+  <string name="skip_background_location">Continuar sem localização em segundo plano</string>
+  <string name="cd_location_notes">Notas de localização</string>
+  <string name="channel_count_prefix"> · ⧉ </string>
+  <string name="debug_rssi_fmt">RSSI: %1$s</string>
+  <string name="debug_question_mark">?</string>
+  <string name="dot">.</string>
+  <string name="hash_symbol">#</string>
+  <string name="underscore">_</string>
+  <string name="progress_bar_brackets">[%1$s] %2$d%%</string>
+  <string name="progress_filled">█</string>
+  <string name="progress_empty">░</string>
+  <string name="image_counter">%1$d / %2$d</string>
+  <string name="mention_suggestion_at">@%1$s</string>
+  <string name="mesh_service_channel_name">Serviço de mesh em segundo plano</string>
+  <string name="mesh_service_channel_desc">Mantém a mesh Bluetooth rodando em segundo plano</string>
+  <string name="notification_action_quit_cirabit">Sair do Cirabit</string>
+  <string name="notification_file_pdf">📄</string>
+  <string name="notification_file_zip">🗜️</string>
+  <string name="notification_file_doc">📄</string>
+  <string name="notification_file_xls">📊</string>
+  <string name="notification_file_ppt">📈</string>
+  <string name="notification_file_generic">📎</string>
+  <string name="status_sending">○</string>
+  <string name="status_pending">○</string>
+  <string name="status_sent">✓</string>
+  <string name="status_delivered">✓✓</string>
+  <string name="status_read">✓</string>
+  <string name="status_failed">⚠</string>
+  <string name="warning_emoji">⚠️</string>
+  <string name="perm_background_location_desc">Recomendado para procurar dispositivos próximos enquanto o app está em segundo plano</string>
+  <string name="perm_background_location_system">Permitir acesso à localização em segundo plano</string>
+  <string name="perm_type_background_location">Localização em segundo plano</string>
+  <string name="tor_not_available_in_this_build">Tor não está disponível nesta compilação</string>
 </resources>

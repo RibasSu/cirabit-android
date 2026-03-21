@@ -53,6 +53,11 @@ This project is released into the public domain. See the [LICENSE](LICENSE.md) f
 - **Kotlin**: 1.8.0 or newer
 - **Gradle**: 7.0 or newer
 
+### Official Language Support
+
+- **English (United States)** (`en-US`)
+- **Portuguese (Brazil)** (`pt-BR`)
+
 ### Build Instructions
 
 1. **Clone the repository:**
