@@ -1,1 +1,1 @@
-I, callebtc, creator of bitchat for android, owner of the copyright claims, and owner of the official bitchat android repository (https://github.com/permissionlesstech/bitchat-android), hereby authorize Verse Communication PBC to publish bitchat (com.bitchat.doid) on the Google Play Store.
+I, callebtc, creator of Cirabit for Android, owner of the copyright claims, and owner of the official Cirabit Android repository (https://github.com/sarahsec/cirabit-android), hereby authorize Verse Communication PBC to publish Cirabit (com.cirabit.droid) on the Google Play Store.

@@ -44,9 +44,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Major Bluetooth connection architecture refactoring with dedicated managers
 
 ### Fixed
-- **Critical**: Android-iOS message fragmentation compatibility issues
-  - Fixed fragment size (500→150 bytes) and ID generation for cross-platform messaging
-  - Ensures Android can properly communicate with iOS devices
+- **Critical**: message fragmentation compatibility issues
+  - Fixed fragment size (500→150 bytes) and ID generation for protocol interoperability
+  - Ensures Android can properly communicate with compatible clients
 - DirectMessage notifications and text copying functionality
 - Smart routing optimizations (no relay loops, targeted delivery)
 - Build system compilation issues and null pointer exceptions
@@ -57,7 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reduced excessive logging output
 
 ### Improved
-- Cross-platform compatibility with iOS and Rust implementations
+- Cross-client compatibility improvements
 - Connection stability through architectural improvements
 - Battery performance via scan duty cycling
 - User onboarding with location services education
@@ -82,7 +82,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Improved private chat and channel header button layouts
   - Fixed button padding and alignment issues
 - Color scheme consistency updates
-  - Updated orange color throughout the app to match iOS version
+  - Updated orange color throughout the app for visual consistency
   - Consistent color usage for private messages and UI elements
 - App startup reliability improvements
   - Better initialization sequence handling
@@ -148,7 +148,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2] - 2025-07-09
 
 ### Added
-- Initial Android implementation of bitchat protocol
+- Initial Android implementation of cirabit protocol
 - Bluetooth Low Energy mesh networking
 - End-to-end encryption for private messages
 - Channel-based messaging with password protection
@@ -164,15 +164,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1] - 2025-07-08
 
 ### Added
-- Initial release of bitchat Android client
+- Initial release of cirabit Android client
 - Basic mesh networking functionality
 - Core messaging features
-- Protocol compatibility with iOS bitchat client
+- Protocol compatibility improvements for interoperable clients
 
-[Unreleased]: https://github.com/permissionlesstech/bitchat-android/compare/0.5.1...HEAD
-[0.5.1]: https://github.com/permissionlesstech/bitchat-android/compare/0.5...0.5.1
-[0.5]: https://github.com/permissionlesstech/bitchat-android/compare/0.4...0.5
-[0.4]: https://github.com/permissionlesstech/bitchat-android/compare/0.3...0.4
-[0.3]: https://github.com/permissionlesstech/bitchat-android/compare/0.2...0.3
-[0.2]: https://github.com/permissionlesstech/bitchat-android/compare/0.1...0.2
-[0.1]: https://github.com/permissionlesstech/bitchat-android/releases/tag/0.1
+[Unreleased]: https://github.com/sarahsec/cirabit-android/compare/0.5.1...HEAD
+[0.5.1]: https://github.com/sarahsec/cirabit-android/compare/0.5...0.5.1
+[0.5]: https://github.com/sarahsec/cirabit-android/compare/0.4...0.5
+[0.4]: https://github.com/sarahsec/cirabit-android/compare/0.3...0.4
+[0.3]: https://github.com/sarahsec/cirabit-android/compare/0.2...0.3
+[0.2]: https://github.com/sarahsec/cirabit-android/compare/0.1...0.2
+[0.1]: https://github.com/sarahsec/cirabit-android/releases/tag/0.1
