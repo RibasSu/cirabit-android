@@ -9,11 +9,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
@@ -70,6 +72,7 @@ class MainActivity : OrientationAwareActivity() {
     }
     private var shouldRequireAppUnlock = false
     private var isAppUnlockInProgress = false
+    private var isAppContentUnlocked by mutableStateOf(true)
     private val appLockPrompt by lazy { createAppLockPrompt() }
     
     private val forceFinishReceiver = object : android.content.BroadcastReceiver() {
@@ -120,6 +123,7 @@ class MainActivity : OrientationAwareActivity() {
         permissionManager = PermissionManager(this)
         AppLockPreferenceManager.init(this)
         shouldRequireAppUnlock = AppLockPreferenceManager.isEnabled()
+        isAppContentUnlocked = !shouldRequireAppUnlock
         // Ensure foreground service is running and get mesh instance from holder
         try { com.cirabit.android.service.MeshForegroundService.start(applicationContext) } catch (_: Exception) { }
         meshService = com.cirabit.android.service.MeshServiceHolder.getOrCreate(applicationContext)
@@ -157,10 +161,19 @@ class MainActivity : OrientationAwareActivity() {
                     modifier = Modifier.fillMaxSize(),
                     containerColor = MaterialTheme.colorScheme.background
                 ) { innerPadding ->
-                    OnboardingFlowScreen(modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                    )
+                    if (isAppContentUnlocked) {
+                        OnboardingFlowScreen(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                        )
+                    } else {
+                        AppLockGateScreen(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                        )
+                    }
                 }
             }
         }
@@ -181,6 +194,14 @@ class MainActivity : OrientationAwareActivity() {
         }
     }
     
+    @Composable
+    private fun AppLockGateScreen(modifier: Modifier = Modifier) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {}
+    }
+
     @Composable
     private fun OnboardingFlowScreen(modifier: Modifier = Modifier) {
         val context = LocalContext.current
@@ -727,32 +748,14 @@ class MainActivity : OrientationAwareActivity() {
     
     override fun onResume() {
         super.onResume()
+        if (shouldRequireAppUnlock) {
+            maybeAuthenticateAppLock()
+            if (shouldRequireAppUnlock || isAppUnlockInProgress) return
+        }
+
         // Check Bluetooth and Location status on resume and handle accordingly
         if (mainViewModel.onboardingState.value == OnboardingState.COMPLETE) {
-            // Reattach mesh delegate to new ChatViewModel instance after Activity recreation
-            try { meshService.delegate = chatViewModel } catch (_: Exception) { }
-
-            // Check if Bluetooth was disabled while app was backgrounded
-            val currentBluetoothStatus = bluetoothStatusManager.checkBluetoothStatus()
-            if (currentBluetoothStatus != BluetoothStatus.ENABLED) {
-                Log.w("MainActivity", "Bluetooth disabled while app was backgrounded")
-                mainViewModel.updateBluetoothStatus(currentBluetoothStatus)
-                mainViewModel.updateOnboardingState(OnboardingState.BLUETOOTH_CHECK)
-                mainViewModel.updateBluetoothLoading(false)
-                return
-            }
-            
-            // Check if location services were disabled while app was backgrounded
-            val currentLocationStatus = locationStatusManager.checkLocationStatus()
-            if (currentLocationStatus != LocationStatus.ENABLED) {
-                Log.w("MainActivity", "Location services disabled while app was backgrounded")
-                mainViewModel.updateLocationStatus(currentLocationStatus)
-                mainViewModel.updateOnboardingState(OnboardingState.LOCATION_CHECK)
-                mainViewModel.updateLocationLoading(false)
-                return
-            }
-
-            maybeAuthenticateAppLock()
+            handlePostUnlockResumeChecks()
         }
     }
     
@@ -769,7 +772,32 @@ class MainActivity : OrientationAwareActivity() {
                 !isAppUnlockInProgress
             ) {
                 shouldRequireAppUnlock = true
+                isAppContentUnlocked = false
             }
+        }
+    }
+
+    private fun handlePostUnlockResumeChecks() {
+        // Reattach mesh delegate to new ChatViewModel instance after Activity recreation
+        try { meshService.delegate = chatViewModel } catch (_: Exception) { }
+
+        // Check if Bluetooth was disabled while app was backgrounded
+        val currentBluetoothStatus = bluetoothStatusManager.checkBluetoothStatus()
+        if (currentBluetoothStatus != BluetoothStatus.ENABLED) {
+            Log.w("MainActivity", "Bluetooth disabled while app was backgrounded")
+            mainViewModel.updateBluetoothStatus(currentBluetoothStatus)
+            mainViewModel.updateOnboardingState(OnboardingState.BLUETOOTH_CHECK)
+            mainViewModel.updateBluetoothLoading(false)
+            return
+        }
+
+        // Check if location services were disabled while app was backgrounded
+        val currentLocationStatus = locationStatusManager.checkLocationStatus()
+        if (currentLocationStatus != LocationStatus.ENABLED) {
+            Log.w("MainActivity", "Location services disabled while app was backgrounded")
+            mainViewModel.updateLocationStatus(currentLocationStatus)
+            mainViewModel.updateOnboardingState(OnboardingState.LOCATION_CHECK)
+            mainViewModel.updateLocationLoading(false)
         }
     }
 
@@ -782,7 +810,12 @@ class MainActivity : OrientationAwareActivity() {
                     super.onAuthenticationSucceeded(result)
                     isAppUnlockInProgress = false
                     shouldRequireAppUnlock = false
+                    isAppContentUnlocked = true
                     Log.d("MainActivity", "App lock authentication succeeded")
+
+                    if (mainViewModel.onboardingState.value == OnboardingState.COMPLETE) {
+                        handlePostUnlockResumeChecks()
+                    }
                 }
 
                 override fun onAuthenticationFailed() {
@@ -794,6 +827,7 @@ class MainActivity : OrientationAwareActivity() {
                     super.onAuthenticationError(errorCode, errString)
                     isAppUnlockInProgress = false
                     shouldRequireAppUnlock = true
+                    isAppContentUnlocked = false
                     Log.w("MainActivity", "App lock authentication error ($errorCode): $errString")
 
                     if (mainViewModel.onboardingState.value == OnboardingState.COMPLETE) {
@@ -808,6 +842,7 @@ class MainActivity : OrientationAwareActivity() {
         if (isAppUnlockInProgress || !shouldRequireAppUnlock) return
         if (!AppLockPreferenceManager.isEnabled()) {
             shouldRequireAppUnlock = false
+            isAppContentUnlocked = true
             return
         }
 
@@ -819,9 +854,11 @@ class MainActivity : OrientationAwareActivity() {
             )
             AppLockPreferenceManager.setEnabled(this, false)
             shouldRequireAppUnlock = false
+            isAppContentUnlocked = true
             return
         }
 
+        isAppContentUnlocked = false
         isAppUnlockInProgress = true
         appLockPrompt.authenticate(
             BiometricPrompt.PromptInfo.Builder()
