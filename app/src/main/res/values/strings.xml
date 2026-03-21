@@ -147,6 +147,8 @@
   <string name="about_app_lock_unavailable_desc">biometrics or device credentials are unavailable on this device.</string>
   <string name="app_lock_prompt_title">unlock cirabit</string>
   <string name="app_lock_prompt_subtitle">authenticate to continue</string>
+  <string name="app_lock_gate_message">cirabit is locked.</string>
+  <string name="app_lock_retry_button">try again</string>
 
   <!-- Generic content descriptions -->
   <string name="cd_warning">Warning</string>

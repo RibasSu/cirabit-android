@@ -9,15 +9,21 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.ViewModelProvider
@@ -199,7 +205,30 @@ class MainActivity : OrientationAwareActivity() {
         Box(
             modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
-        ) {}
+        ) {
+            Column(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.app_lock_prompt_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    text = stringResource(R.string.app_lock_gate_message),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                )
+                Button(
+                    onClick = { maybeAuthenticateAppLock() },
+                    enabled = !isAppUnlockInProgress
+                ) {
+                    Text(text = stringResource(R.string.app_lock_retry_button))
+                }
+            }
+        }
     }
 
     @Composable
