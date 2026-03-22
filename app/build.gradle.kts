@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -29,6 +31,26 @@ android {
         includeInBundle = false
     }
 
+    val signingPropertiesFile = rootProject.file("signing.properties")
+    val signingProperties = Properties()
+    if (signingPropertiesFile.exists()) {
+        signingPropertiesFile.inputStream().use(signingProperties::load)
+    }
+
+    val hasReleaseSigning = listOf("STORE_FILE", "STORE_PASSWORD", "KEY_ALIAS", "KEY_PASSWORD")
+        .all { !signingProperties.getProperty(it).isNullOrBlank() }
+
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = rootProject.file(signingProperties.getProperty("STORE_FILE"))
+                storePassword = signingProperties.getProperty("STORE_PASSWORD")
+                keyAlias = signingProperties.getProperty("KEY_ALIAS")
+                keyPassword = signingProperties.getProperty("KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         debug {
             ndk {
@@ -37,6 +59,10 @@ android {
             }
         }
         release {
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -95,18 +121,18 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
-    
+
     // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
-    
+
     // Lifecycle
     implementation(libs.bundles.lifecycle)
     implementation(libs.androidx.lifecycle.process)
-    
+
     // Navigation
     implementation(libs.androidx.navigation.compose)
-    
+
     // Permissions
     implementation(libs.accompanist.permissions)
 
@@ -118,16 +144,16 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.compose)
-    
+
     // Cryptography
     implementation(libs.bundles.cryptography)
-    
+
     // JSON
     implementation(libs.gson)
-    
+
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
-    
+
     // Bluetooth
     implementation(libs.nordic.ble)
 
@@ -144,10 +170,10 @@ dependencies {
     implementation(libs.gms.location)
 
     implementation(libs.androidx.biometric)
-    
+
     // EXIF orientation handling for images
     implementation("androidx.exifinterface:exifinterface:1.3.7")
-    
+
     // Testing
     testImplementation(libs.bundles.testing)
     androidTestImplementation(platform(libs.androidx.compose.bom))
