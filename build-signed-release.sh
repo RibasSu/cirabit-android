@@ -91,7 +91,13 @@ if [[ "$RUN_CLEAN" == "true" ]]; then
 fi
 
 echo "Iniciando build assinado com tarefas: ${TASKS[*]}"
-"$GRADLEW" "${TASKS[@]}" --no-daemon
+
+# Execute uma tarefa por invocacao para evitar conflitos entre assemble+bundle
+# quando ABI splits estao ativos.
+for task in "${TASKS[@]}"; do
+  echo ">> Executando: $task"
+  "$GRADLEW" "$task" --no-daemon
+done
 
 TIMESTAMP="$(date +"%Y%m%d-%H%M%S")"
 RELEASE_DIR="$OUT_ROOT/$TIMESTAMP"
