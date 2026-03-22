@@ -70,5 +70,20 @@ The application follows a clean architecture pattern, heavily modularized by fea
 - **Lint Check**: `./gradlew lint`
 - **Clean Build**: `./gradlew clean`
 
+## 7. Documentation & Release Hygiene (Required)
+When implementing meaningful changes, agents must also update project-facing release/docs files in the same PR/commit set.
+
+### Always Review
+- `README.md` for install/distribution/build instructions and user-facing behavior changes.
+- `CHANGELOG.md` under `## [Unreleased]` using Keep a Changelog sections (`Added`, `Changed`, `Fixed`, etc.).
+- `fastlane/metadata/android/en-US/changelog/<versionCode>.txt` for Play/Fastlane release notes.
+
+### Required Rules
+1. If app behavior, settings, commands, onboarding, or distribution changes, update `README.md`.
+2. If any feature/fix/refactor affects users or release notes, add an entry to `CHANGELOG.md` (`Unreleased`).
+3. If preparing a release or updating release-impacting functionality, ensure `fastlane` changelog exists for current `versionCode` and reflects the same highlights.
+4. Keep wording concise, factual, and consistent across all three files (no contradictory distribution channels or outdated instructions).
+5. Before finishing, verify these docs were checked and updated when applicable.
+
 ---
 *Note: This file is intended to assist AI agents in navigating and modifying the codebase efficiently. Always verify context by reading the actual files before making changes.*
