@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed file `readBytes()` from chat rendering path; file cards now render from metadata/path only.
 - Fixed deterministic file/media message IDs across sender and receiver (including encrypted Noise file transfer), restoring emoji reaction targeting for media messages.
 - Added pending private-reaction queue during Noise handshake with per-peer cap and TTL, then automatic flush after session establishment.
+- Overrode AGP transitive `org.jdom:jdom2` to `2.0.6.1` in buildscript classpath to mitigate CVE-2021-33813 (XXE/DoS in `SAXBuilder`).
 
 ## [1.4.0] - 2025-10-15
 ### Fixed
