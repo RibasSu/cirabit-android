@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Overrode AGP/UTP transitive protobuf artifacts to `3.25.5` (`protobuf-java`, `protobuf-javalite`, `protobuf-kotlin`, `protobuf-kotlin-lite`) to mitigate CVE-2024-7254 (unknown-field recursion DoS).
 - Overrode AGP/UTP transitive Netty artifacts to `4.1.118.Final` (`netty-handler` and related core modules) to mitigate CVE-2025-24970 (native crash via crafted TLS packet).
 - Overrode AGP transitive `org.bitbucket.b_c:jose4j` to `0.9.6` to mitigate CVE-2024-29371 (JWE decompression DoS).
+- Overrode AGP transitive `org.apache.commons:commons-compress` to `1.26.0` to mitigate CVE-2024-26308 (Pack200 decompression OOM/DoS).
 
 ## [1.4.0] - 2025-10-15
 ### Fixed

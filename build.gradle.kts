@@ -40,6 +40,11 @@ buildscript {
                     useVersion("0.9.6")
                     because("Mitigate CVE-2024-29371 in AGP transitive dependency")
                 }
+
+                requested.group == "org.apache.commons" && requested.name == "commons-compress" -> {
+                    useVersion("1.26.0")
+                    because("Mitigate CVE-2024-26308 in AGP transitive dependency")
+                }
             }
         }
     }
