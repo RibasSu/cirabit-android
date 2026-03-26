@@ -212,7 +212,7 @@ class LocationChannelManager private constructor(private val context: Context) {
      * Select a channel
      */
     fun select(channel: ChannelID) {
-        Log.d(TAG, "Selected channel: ${channel.displayName}")
+        Log.d(TAG, "Selected channel: ${sanitizeForSingleLineLog(channel.displayName)}")
         // Use synchronous set to avoid race with background recomputation
         _selectedChannel.value = channel
         saveChannelSelection(channel)
@@ -584,4 +584,12 @@ class LocationChannelManager private constructor(private val context: Context) {
         // Unregister receiver
         try { context.unregisterReceiver(locationStateReceiver) } catch (_: Exception) {}
     }
+}
+
+internal fun sanitizeForSingleLineLog(value: String): String {
+    return value
+        .replace('\r', ' ')
+        .replace('\n', ' ')
+        .replace('\u2028', ' ')
+        .replace('\u2029', ' ')
 }
