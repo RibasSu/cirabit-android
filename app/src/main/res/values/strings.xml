@@ -228,6 +228,8 @@
   <string name="action_hug_subtitle">Send a friendly hug message</string>
   <string name="action_block_title">Block %1$s</string>
   <string name="action_block_subtitle">Block all messages from this user</string>
+  <string name="action_private_message_title">Message %1$s</string>
+  <string name="action_private_message_subtitle">Send a private message</string>
   <string name="command_desc_hug">Send someone a warm hug</string>
   <string name="command_desc_slap">Slap someone with a trout</string>
   <string name="command_action_hug_format">* %1$s gives %2$s a warm hug 🫂 *</string>

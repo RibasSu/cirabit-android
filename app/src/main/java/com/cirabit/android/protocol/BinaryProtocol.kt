@@ -285,6 +285,15 @@ object BinaryProtocol {
             else -> HEADER_SIZE_V2  // v2+ will use 4-byte payload length
         }
     }
+
+    private fun maxAllowedPayloadLength(type: UByte): Long {
+        return if (type == MessageType.FILE_TRANSFER.value) {
+            com.cirabit.android.util.AppConstants.Media.MAX_INCOMING_FILE_BYTES +
+                com.cirabit.android.util.AppConstants.Media.MAX_FILE_PACKET_OVERHEAD_BYTES
+        } else {
+            com.cirabit.android.util.AppConstants.Protocol.MAX_PAYLOAD_LENGTH.toLong()
+        }
+    }
     
     fun encode(packet: CirabitPacket): ByteArray? {
         try {
@@ -453,9 +462,18 @@ object BinaryProtocol {
                 buffer.getShort().toUShort().toUInt()  // 2 bytes for v1, convert to UInt
             }
 
+            val maxPayloadLength = maxAllowedPayloadLength(type)
+            if (payloadLength.toLong() > maxPayloadLength) {
+                Log.w(
+                    "BinaryProtocol",
+                    "Payload length $payloadLength exceeds maximum allowed ($maxPayloadLength) for type=$type"
+                )
+                return null
+            }
+
             // Calculate expected total size
-            var expectedSize = headerSize + SENDER_ID_SIZE + payloadLength.toInt()
-            if (hasRecipient) expectedSize += RECIPIENT_ID_SIZE
+            var expectedSize = headerSize.toLong() + SENDER_ID_SIZE.toLong() + payloadLength.toLong()
+            if (hasRecipient) expectedSize += RECIPIENT_ID_SIZE.toLong()
             var routeCount = 0
             if (hasRoute) {
                 // Peek count (1 byte) without consuming buffer for now
@@ -470,11 +488,11 @@ object BinaryProtocol {
                 if (raw.size >= routeOffset + 1) {
                     routeCount = raw[routeOffset].toUByte().toInt()
                 }
-                expectedSize += 1 + (routeCount * SENDER_ID_SIZE)
+                expectedSize += 1L + (routeCount.toLong() * SENDER_ID_SIZE.toLong())
             }
-            if (hasSignature) expectedSize += SIGNATURE_SIZE
+            if (hasSignature) expectedSize += SIGNATURE_SIZE.toLong()
 
-            if (raw.size < expectedSize) return null
+            if (raw.size.toLong() < expectedSize) return null
             
             // SenderID
             val senderID = ByteArray(SENDER_ID_SIZE)
@@ -512,6 +530,13 @@ object BinaryProtocol {
                     buffer.getInt()
                 } else {
                     buffer.getShort().toUShort().toInt()
+                }
+                if (originalSize < 0 || originalSize.toLong() > maxPayloadLength) {
+                    Log.w(
+                        "BinaryProtocol",
+                        "Compressed original payload size $originalSize exceeds maximum allowed ($maxPayloadLength) for type=$type"
+                    )
+                    return null
                 }
                 
                 // Compressed payload
