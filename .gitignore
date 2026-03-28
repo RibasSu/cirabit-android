@@ -67,3 +67,30 @@ tools/arti-build/target/
 signing.properties
 keystore/
 release-artifacts/
+
+# IDE / Editors
+.idea/
+*.iml
+.vscode/
+.fleet/
+.eclipse/
+*.suo
+*.user
+.vs/
+*.swp
+*~
+.goosehints
+
+# AI / Agents
+.goosehints
+.cursor/
+.cursorignore
+.cursorindexingignore
+CLAUDE.md
+.claude/
+.aider*
+.continue/
+.codeium/
+.copilot/
+codex.md
+.codex/
