@@ -1127,7 +1127,7 @@ class BinaryProtocolTest {
     @Test
     fun `v2 packet payload length above max is rejected`() {
         val overLimitPayloadLength = AppConstants.Protocol.MAX_PAYLOAD_LENGTH + 1
-        val buffer = ByteBuffer.allocate(16 + 8 + overLimitPayloadLength).apply { order(ByteOrder.BIG_ENDIAN) }
+        val buffer = ByteBuffer.allocate(16 + 8).apply { order(ByteOrder.BIG_ENDIAN) }
 
         buffer.put(2.toByte()) // version
         buffer.put(MessageType.MESSAGE.value.toByte()) // type
@@ -1136,16 +1136,41 @@ class BinaryProtocolTest {
         buffer.put(0.toByte()) // flags
         buffer.putInt(overLimitPayloadLength) // payload length
         buffer.put(hexToBytes(senderHex)) // sender
-        buffer.put(ByteArray(overLimitPayloadLength) { 0x55.toByte() }) // payload bytes
 
         val raw = ByteArray(buffer.position())
         buffer.rewind()
         buffer.get(raw)
 
-        val padded = MessagePadding.pad(raw, MessagePadding.optimalBlockSize(raw.size))
-        val result = BinaryProtocol.decode(padded)
+        val result = BinaryProtocol.decode(raw)
 
         assertNull("payload above max must be rejected", result)
+    }
+
+    @Test
+    fun `v2 file transfer payload above generic max is accepted within media limit`() {
+        val payloadLength = AppConstants.Protocol.MAX_PAYLOAD_LENGTH + 1
+        val payload = ByteArray(payloadLength) { (it % 251).toByte() }
+        val buffer = ByteBuffer.allocate(16 + 8 + payloadLength).apply { order(ByteOrder.BIG_ENDIAN) }
+
+        buffer.put(2.toByte()) // version
+        buffer.put(MessageType.FILE_TRANSFER.value.toByte()) // type
+        buffer.put(5.toByte()) // ttl
+        buffer.putLong(fixedTimestamp.toLong()) // timestamp
+        buffer.put(0.toByte()) // flags
+        buffer.putInt(payloadLength) // payload length
+        buffer.put(hexToBytes(senderHex)) // sender
+        buffer.put(payload)
+
+        val raw = ByteArray(buffer.position())
+        buffer.rewind()
+        buffer.get(raw)
+
+        val decoded = BinaryProtocol.decode(raw)
+
+        assertNotNull("file transfer payload just above generic max should decode", decoded)
+        assertEquals("type should be file transfer", MessageType.FILE_TRANSFER.value, decoded!!.type)
+        assertEquals("payload length should match", payloadLength, decoded.payload.size)
+        assertTrue("payload bytes should match", payload.contentEquals(decoded.payload))
     }
 
     private fun hexToBytes(hex: String): ByteArray {

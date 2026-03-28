@@ -50,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed user-controlled channel names from `LocationChannelManager.select()` logs to prevent log injection (`java/log-injection`).
 - Hardened fragment reassembly against multi-set memory pressure by enforcing active-set/global-buffer caps and synchronized state transitions.
 - Added protocol decode guardrails for oversized payload declarations (`MAX_PAYLOAD_LENGTH`) before allocation.
+- Restored valid large file transfer decode path by applying type-aware payload limits (`FILE_TRANSFER` now honors `MAX_INCOMING_FILE_BYTES + MAX_FILE_PACKET_OVERHEAD_BYTES` instead of the generic 10 MiB cap).
 - Added geohash DM resolution helpers for nickname and short-id lookup (`startGeohashDMByNickname`, `startGeohashDMByShortId`, `findPubkeyByShortId`).
 
 ## [1.4.0] - 2025-10-15

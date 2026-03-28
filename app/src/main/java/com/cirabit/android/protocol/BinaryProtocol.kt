@@ -285,6 +285,15 @@ object BinaryProtocol {
             else -> HEADER_SIZE_V2  // v2+ will use 4-byte payload length
         }
     }
+
+    private fun maxAllowedPayloadLength(type: UByte): Long {
+        return if (type == MessageType.FILE_TRANSFER.value) {
+            com.cirabit.android.util.AppConstants.Media.MAX_INCOMING_FILE_BYTES +
+                com.cirabit.android.util.AppConstants.Media.MAX_FILE_PACKET_OVERHEAD_BYTES
+        } else {
+            com.cirabit.android.util.AppConstants.Protocol.MAX_PAYLOAD_LENGTH.toLong()
+        }
+    }
     
     fun encode(packet: CirabitPacket): ByteArray? {
         try {
@@ -453,10 +462,11 @@ object BinaryProtocol {
                 buffer.getShort().toUShort().toUInt()  // 2 bytes for v1, convert to UInt
             }
 
-            if (payloadLength > com.cirabit.android.util.AppConstants.Protocol.MAX_PAYLOAD_LENGTH.toUInt()) {
+            val maxPayloadLength = maxAllowedPayloadLength(type)
+            if (payloadLength.toLong() > maxPayloadLength) {
                 Log.w(
                     "BinaryProtocol",
-                    "Payload length ${payloadLength} exceeds maximum allowed (${com.cirabit.android.util.AppConstants.Protocol.MAX_PAYLOAD_LENGTH})"
+                    "Payload length $payloadLength exceeds maximum allowed ($maxPayloadLength) for type=$type"
                 )
                 return null
             }
@@ -520,6 +530,13 @@ object BinaryProtocol {
                     buffer.getInt()
                 } else {
                     buffer.getShort().toUShort().toInt()
+                }
+                if (originalSize < 0 || originalSize.toLong() > maxPayloadLength) {
+                    Log.w(
+                        "BinaryProtocol",
+                        "Compressed original payload size $originalSize exceeds maximum allowed ($maxPayloadLength) for type=$type"
+                    )
+                    return null
                 }
                 
                 // Compressed payload
