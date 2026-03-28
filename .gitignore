@@ -13,6 +13,7 @@ debug_keystore/
 *.keystore
 debug.keystore
 app/release
+.kotlin/
 
 # Gradle
 /build/
